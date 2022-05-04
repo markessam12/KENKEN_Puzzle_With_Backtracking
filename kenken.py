@@ -20,21 +20,67 @@ class Kenken:
     #Engy and Eman, Engy will start on the gui after her work on the constrain checking functions
     def Bounding(self, row, col, value):
         """
-        responsible for Column checking, Row checking, and Grid checking
-        :return: returns true if the current chosen numbers satisfy the game rules and false otherwise
+        Responsible for Column checking, Row checking, and Grid checking
+        This function checks if all ken-ken puzzle constraints (rules) are applied or not.
+
+        :param row: cell row position
+        :param col: cell column position
+        :param value: cell value
+        :return: returns True if the current chosen numbers satisfy the game rules and false otherwise
         """
-        pass
+
+        isAllConstraintsApplied = False
+        conditionsList = [self.check_row(row= row, value= value), # --- check row constraint ---
+                          self.check_column(col= col, value= value), # --- check column constraint ---
+                          self.check_cage(row= row, col= col, value= value)] # --- check cage operation constraint ---
+        if all(conditionsList):
+            isAllConstraintsApplied = True
+
+        return isAllConstraintsApplied
 
     #Engy
     def check_row(self, row, value):
-        pass
+        """
+        This function returns true iff row has no cell containing value same as the given value,
+        and return false otherwise.
+        NOTE: this function should be called before assigning a value in a cell by the solver
+        :param row: row number
+        :param value: value to check if present in the given row
+        :return: True if row constraint is applied: No repeated values
+        """
+        # --- Default: Row constraint is applied ---
+        isConstraintApplied = True
+        # --- self.grid[row] is a 1-D list ---
+        for columnItem in self.grid[row]:
+            # --- check if there is a repeated value ---
+            if columnItem == value:
+                isConstraintApplied = False
+
+        return isConstraintApplied
+
 
     #Engy
     def check_column(self, col, value):
-        pass
+        """
+               This function returns true iff col has no cell containing value same as the given value,
+               and return false otherwise.
+               NOTE: this function should be called before assigning a value in a cell by the solver
+               :param col: col number
+               :param value: value to check if present in the given row
+               :return: True if row constraint is applied: No repeated values
+               """
+        # --- Default: Column constraint is applied ---
+        isConstraintApplied = True
+        # --- self.grid[col] is a 1-D list ---
+        for columnItem in self.grid[col]:
+            # --- check if there is a repeated value ---
+            if columnItem == value:
+                isConstraintApplied = False
+
+        return isConstraintApplied
 
     #Eman
-    def check_cage(self, raw, col, value):
+    def check_cage(self, row, col, value):
         pass
 
     #Mark and Mark
@@ -55,6 +101,41 @@ class Kenken:
     def print(self):
         pass
 
-    #Engy
+    # Engy
     def find_empty(self):
-        pass
+        """
+        :return: first empty position to use it next
+        """
+        boardSize = len(self.grid)
+        # --- Loop over each cell position and check its value ---
+        for row in range(boardSize):
+            for col in range(boardSize):
+                # --- if cellValue is "0" means empty cell ---
+                cellValue = self.grid[row][col]
+                # --- typeCasting "int()" to ensure that if condition is valid in case the self.grid 2-D list
+                #     is initialized by "0" value as a string ---
+                if int(cellValue) == 0:
+                    # --- return first empty position to work on it next ---
+                    return (row,col)
+    #Engy
+    def findListOfEmptyPositions(self):
+        """
+        This list return list of tuples containing all cells' positions has "0"(zero) value.
+        Where "zero" in our kenkenSolver means undefined value or EMPTY CELL.
+        :return: emptyPositionsList
+        """
+        emptyPositionsList = []
+        # --- boardSize is needed to be dynamic depending on the random value that the user choose ---
+        boardSize = len(self.grid)
+        # --- Loop over each cell position and check its value ---
+        for row in range(boardSize):
+            for col in range(boardSize):
+                # --- if cellValue is "0" means empty cell ---
+                cellValue = self.grid[row][col]
+                # --- typeCasting "int()" to ensure that if condition is valid in case the self.grid 2-D list
+                #     is initialized by "0" value as a string ---
+                if int(cellValue) == 0:
+                    # --- append empty position in emptyPositionsList ---
+                    emptyPositionsList.append((row,col))
+
+        return emptyPositionsList
