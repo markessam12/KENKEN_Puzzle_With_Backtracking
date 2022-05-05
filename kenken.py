@@ -8,6 +8,7 @@ class Kenken:
         """
         #Zamala needs to type a hardcoded example here for trials
         (self.grid, self.cage) = self.generate(self,random.randint(3, 9))
+        self.n = len(self.grid)
 
     #Tarek and Zamala
     def generate(self, size):
@@ -94,8 +95,23 @@ class Kenken:
         pass
 
     #Mark and Mark
-    def backtracking(self, forward_check, arc_consistency):
-        pass
+    def backtracking(self):
+        row, col = self.find_empty()
+        # Base case
+        if row is None:
+            return True
+
+        # iterate over all possible values to test them
+        for i in range(1, self.n + 1):
+            # check if the current value will obey all constrains
+            if self.Bounding(row, col, i):
+                self.grid[row][col] = i
+                if self.backtracking():
+                    return True
+
+        # backtrack the value
+        self.grid[row][col] = 0
+        return False
 
     #Zamala
     def print(self):
