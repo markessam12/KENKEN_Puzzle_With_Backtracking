@@ -1,7 +1,7 @@
 import random
 
 class Kenken:
-    def __init__(self):
+    def __init__(self, n=3):
         """
         grid: 2d list of current existing numbers, zeros for empty cells
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
@@ -9,6 +9,16 @@ class Kenken:
         #Zamala needs to type a hardcoded example here for trials
         (self.grid, self.cage) = self.generate(self,random.randint(3, 9))
         self.n = len(self.grid)
+        #3D list for the domain of available values for each cell (1d for each cell in the 2d grid)
+        self.domains = [[[True for i in range(1, self.n+1)]]*self.n]*self.n
+        """
+        Example:
+        [
+        [[True, True, True], [True, True, True], [True, True, True]],
+        [[True, True, True], [True, True, True], [True, True, True]],
+        [[True, True, True], [True, True, True], [True, True, True]]
+        ]
+        """
 
     #Tarek and Zamala
     def generate(self, size):
@@ -63,19 +73,19 @@ class Kenken:
     #Engy
     def check_column(self, col, value):
         """
-               This function returns true iff col has no cell containing value same as the given value,
-               and return false otherwise.
-               NOTE: this function should be called before assigning a value in a cell by the solver
-               :param col: col number
-               :param value: value to check if present in the given row
-               :return: True if row constraint is applied: No repeated values
-               """
+        This function returns true iff col has no cell containing value same as the given value,
+        and return false otherwise.
+        NOTE: this function should be called before assigning a value in a cell by the solver
+        :param col: col number
+        :param value: value to check if present in the given row
+        :return: True if col constraint is applied: No repeated values
+        """
         # --- Default: Column constraint is applied ---
         isConstraintApplied = True
-        # --- self.grid[col] is a 1-D list ---
-        for columnItem in self.grid[col]:
+        # --- Iterate over each row ---
+        for row in range(self.n):
             # --- check if there is a repeated value ---
-            if columnItem == value:
+            if self.grid[row][col] == value:
                 isConstraintApplied = False
 
         return isConstraintApplied
@@ -92,7 +102,12 @@ class Kenken:
         :param arc_consistency: enable arc consistency mode
         :return:
         """
-        pass
+        if forward_check and not arc_consistency:
+            self.backtracking_FC()
+        elif forward_check and arc_consistency:
+            pass
+        elif not forward_check and not arc_consistency:
+            self.backtracking()
 
     #Mark and Mark
     def backtracking(self):
@@ -113,6 +128,36 @@ class Kenken:
         self.grid[row][col] = 0
         return False
 
+    def backtracking_FC(self):
+        row, col = self.find_empty()
+        # Base case
+        if row is None:
+            return True
+
+        # iterate over all possible values in the domain to test them
+        for value in range(1, self.n+1):
+            # check if the current value is in the domain of the cell
+            if self.domains[row][col][value]:
+                # check if the current value will obey all constrains
+                if self.Bounding(row, col, value):
+                    self.grid[row][col] = value
+                    # forward checking the current value in all the neighbouring cells
+                    self.forward_check(row, col, value, setting=False)
+                    if self.backtracking():
+                        return True
+                    # return the removed value to the domains of the neighbouring cells
+                    self.forward_check(row, col, value, setting=True)
+
+        # backtrack the value
+        self.grid[row][col] = 0
+        return False
+
+    def forward_check(self, row, col, value, setting=False):
+        for i in range(1, self.n + 1):
+            self.domains[i][col][value] = setting
+            self.domains[row][i][value] = setting
+
+
     #Zamala
     def print(self):
         pass
@@ -122,10 +167,9 @@ class Kenken:
         """
         :return: first empty position to use it next
         """
-        boardSize = len(self.grid)
         # --- Loop over each cell position and check its value ---
-        for row in range(boardSize):
-            for col in range(boardSize):
+        for row in range(self.n):
+            for col in range(self.n):
                 # --- if cellValue is "0" means empty cell ---
                 cellValue = self.grid[row][col]
                 # --- typeCasting "int()" to ensure that if condition is valid in case the self.grid 2-D list
@@ -133,6 +177,7 @@ class Kenken:
                 if int(cellValue) == 0:
                     # --- return first empty position to work on it next ---
                     return (row,col)
+        return (None,None)
     #Engy
     def findListOfEmptyPositions(self):
         """
@@ -141,11 +186,9 @@ class Kenken:
         :return: emptyPositionsList
         """
         emptyPositionsList = []
-        # --- boardSize is needed to be dynamic depending on the random value that the user choose ---
-        boardSize = len(self.grid)
         # --- Loop over each cell position and check its value ---
-        for row in range(boardSize):
-            for col in range(boardSize):
+        for row in range(self.n):
+            for col in range(self.n):
                 # --- if cellValue is "0" means empty cell ---
                 cellValue = self.grid[row][col]
                 # --- typeCasting "int()" to ensure that if condition is valid in case the self.grid 2-D list
