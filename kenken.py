@@ -13,7 +13,8 @@ class Kenken:
             3: {"value" :2, "op":'none',"cells":[(0,2)]}, #this sell has no operation
             4: {"value" :3, "op":'+',   "cells":[(2,0),(2,1)]},
             5: {"value" :4, "op":'+',   "cells":[(1,2),(2,2)]}
-    }
+         }
+          example1_grid=[[1,3,2],[3,2,1],[2,1,3]]
         (self.grid, self.cage) = self.generate(self,random.randint(3, 9))
         self.n = len(self.grid)
         #3D list for the domain of available values for each cell (1d for each cell in the 2d grid)
