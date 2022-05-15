@@ -14,12 +14,13 @@ class Kenken:
             4: {"value" :3, "op":'+',   "cells":[(2,0),(2,1)]},
             5: {"value" :4, "op":'+',   "cells":[(1,2),(2,2)]}
          }
-        self.grid=[[1,3,2],[3,2,1],[2,1,3]]
-        (self.grid, self.cages) = self.generate(self,random.randint(3, 9))
+        #Solution is [[1,3,2],[3,2,1],[2,1,3]]
+        self.grid = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        # enable generate again when it's ready and disable the hardcoded example
+        # (self.grid, self.cages) = self.generate(self,random.randint(3, 9))
         self.n = len(self.grid)
         #3D list for the domain of available values for each cell (1d for each cell in the 2d grid)
         self.domains = [[[True for i in range(1, self.n+1)]]*self.n]*self.n
-
         # --- 2D array, each cell position has cage number as its value ---
         self.cellToCageMap = self.mapCellsToCages()
 
@@ -176,7 +177,7 @@ class Kenken:
         gameSize = len(self.grid)
         cellToCageMap = [ [0]*gameSize for i in range(gameSize)] # --- number of all cells in the game ---
         for cage in self.cages:
-            cellsOfCageTupleList = cage['cells']  # --- cellsOfCage is list of tuples ---
+            cellsOfCageTupleList = self.cages[cage]['cells']  # --- cellsOfCage is list of tuples ---
             for cellTuple in cellsOfCageTupleList:
                 row = cellTuple[0]
                 col = cellTuple[1]
@@ -185,7 +186,7 @@ class Kenken:
         return cellToCageMap
 
     #Mark and Mark
-    def solve(self, forward_check=True, arc_consistency=True):
+    def solve(self, forward_check=True, arc_consistency=False):
         """
         a wrapper function that calls the recursive backtracking function
         :param forward_check: enable forward checking mode
@@ -243,14 +244,14 @@ class Kenken:
         return False
 
     def forward_check(self, row, col, value, setting=False):
-        for i in range(1, self.n + 1):
+        for i in range(0, self.n):
             self.domains[i][col][value] = setting
             self.domains[row][i][value] = setting
 
 
     #Zamala
     def print(self):
-        pass
+        return self.grid
 
     # Engy
     def find_empty(self):
