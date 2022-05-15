@@ -104,7 +104,73 @@ class Kenken:
 
     #Eman
     def check_cage(self, row, col, value):
-        pass
+         
+        """This function takes parameters specifies cell position and the value inside this cell,
+        check the cage of this cell by searching in cellToCageMap 2D array , then access this cage to
+        ensure that this value relative to all other cells in the same cage satisfy cage operation
+        and constraint or not. if satisfied it return "True", else it return "False"
+        """
+        isConstraintApplied =False
+        # search with the row and col (cell position in cellToCageMap 2D array to get cage number 
+        cageNumber = self.cellToCageMap[row][col]
+        cageNeededToBeChecked = self.cages.get(cageNumber)
+        # get cellsList of the cage 
+        cellsList = cageNeededToBeChecked['cells']
+        # get cage operation 
+        cageOperation = cageNeededToBeChecked['op']
+
+        # FreeBie
+        if cageOperation == "none": # freeBie
+            # index of [0] is used because cellsList of this cage contains only ONE cell(freeBie)
+            if int(value) == int(cageNeededToBeChecked['value']):
+                isConstraintApplied = True
+
+        # ADDITION
+        elif cageOperation == "+" : # cellsList > = 2 
+            summationResult = 0
+            for cell in cellsList: # cell is tuple (1,2) 
+                if (row,col) != cell: # sum all cells except the one Iam checking 
+                    summationResult += int(self.grid[cell[0]][cell[1]])
+            if summationResult + int(value) <= int(cageNeededToBeChecked['value']):
+                isConstraintApplied = True
+
+        # SUBTRACTION 
+        elif cageOperation == "-": # cellsList has only 2 cells according to game Rules
+            subtractionResult = 0
+            for cell in cellsList:
+                if (row,col) != cell : # I have this cell value passed to my function 
+                    subtractionResult = int(value) - int(self.grid[cell[0]][cell[1]])
+            # check if constraint is applied
+            if abs(subtractionResult) <= cageNeededToBeChecked['value']:
+                isConstraintApplied = True
+
+        # MULTIPLICATION 
+        elif cageOperation == "*": # cellsList > = 2 
+            multiplicationResult = 1
+            for cell in cellsList:
+                if (row,col) != cell:
+                    multiplicationResult *= self.grid[cell[0]][cell[1]]
+
+            if multiplicationResult * value <= cageNeededToBeChecked['value']:
+                isConstraintApplied = True
+
+        # DIVISION 
+        elif cageOperation == "/": # cellsList = 2
+            divisionResult = 1
+            for cell in cellsList:
+                if (row,col) != cell : # I have this cell value passed to my function 
+                    if value > self.grid[cell[0]][cell[1]]:
+                        # divide greater/smaller
+                        divisionResult = value / self.grid[cell[0]][cell[1]]
+                    else:
+                        # divide greater/smaller
+                        divisionResult = self.grid[cell[0]][cell[1]] / value
+            # check if constraint is applied
+            if divisionResult <= cageNeededToBeChecked['value']:
+                isConstraintApplied = True
+
+        return isConstraintApplied
+        
        
     def mapCellsToCages(self):
         gameSize = len(self.grid)
