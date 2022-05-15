@@ -7,18 +7,22 @@ class Kenken:
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
         """
         #Zamala needs to type a hardcoded example here for trials
-       self.cage = {
+        self.cages = {
             1: {"value" :4, "op":'+',   "cells":[(0,0),(1,0)]},
             2: {"value" :5, "op":'+',   "cells":[(0,1),(1,1)]},
             3: {"value" :2, "op":'none',"cells":[(0,2)]}, #this sell has no operation
             4: {"value" :3, "op":'+',   "cells":[(2,0),(2,1)]},
             5: {"value" :4, "op":'+',   "cells":[(1,2),(2,2)]}
          }
-         self.grid=[[1,3,2],[3,2,1],[2,1,3]]
-        (self.grid, self.cage) = self.generate(self,random.randint(3, 9))
+        self.grid=[[1,3,2],[3,2,1],[2,1,3]]
+        (self.grid, self.cages) = self.generate(self,random.randint(3, 9))
         self.n = len(self.grid)
         #3D list for the domain of available values for each cell (1d for each cell in the 2d grid)
         self.domains = [[[True for i in range(1, self.n+1)]]*self.n]*self.n
+
+        # --- 2D array, each cell position has cage number as its value ---
+        self.cellToCageMap = self.mapCellsToCages()
+
         """
         Example:
         [
@@ -101,6 +105,18 @@ class Kenken:
     #Eman
     def check_cage(self, row, col, value):
         pass
+       
+    def mapCellsToCages(self):
+        gameSize = len(self.grid)
+        cellToCageMap = [ [0]*gameSize for i in range(gameSize)] # --- number of all cells in the game ---
+        for cage in self.cages:
+            cellsOfCageTupleList = cage['cells']  # --- cellsOfCage is list of tuples ---
+            for cellTuple in cellsOfCageTupleList:
+                row = cellTuple[0]
+                col = cellTuple[1]
+                cellToCageMap[row][col] = cage
+
+        return cellToCageMap
 
     #Mark and Mark
     def solve(self, forward_check=True, arc_consistency=True):
@@ -206,3 +222,6 @@ class Kenken:
                     emptyPositionsList.append((row,col))
 
         return emptyPositionsList
+
+
+
