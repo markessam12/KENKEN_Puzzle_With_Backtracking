@@ -8,21 +8,15 @@ class Kenken:
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
         """
         #Zamala needs to type a hardcoded example here for trials
-        self.cages = {
-            1: {"value" :4, "op":'+',   "cells":[(0,0),(1,0)]},
-            2: {"value" :5, "op":'+',   "cells":[(0,1),(1,1)]},
-            3: {"value" :2, "op":'none',"cells":[(0,2)]}, #this sell has no operation
-            4: {"value" :3, "op":'+',   "cells":[(2,0),(2,1)]},
-            5: {"value" :4, "op":'+',   "cells":[(1,2),(2,2)]}
-         }
+       
         #Solution is [[1,3,2],[3,2,1],[2,1,3]]
 
-        self.cages = cages # Take hardcode example, remove when generate function is done.
+       
         # enable generate again when it's ready and disable the hardcoded example
 
         self.grid = [[0 for i in range(n)] for j in range(n)]
 
-        # (self.grid, self.cages) = self.generate(self,random.randint(3, 9))
+        self.cages = self.generate(self,n)
         self.n = n
 
         # --- 2D array, each cell position has cage number as its value ---
