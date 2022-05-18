@@ -1,5 +1,11 @@
 import random
-from hardCodedExamples import *
+from sys import stderr, stdin
+from itertools import product, permutations
+from functools import reduce
+from random import seed, random, shuffle, randint, choice
+from time import time
+from csv import writer
+
 
 class Kenken:
     def __init__(self, n=3):
@@ -8,15 +14,15 @@ class Kenken:
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
         """
         #Zamala needs to type a hardcoded example here for trials
-       
+
         #Solution is [[1,3,2],[3,2,1],[2,1,3]]
 
-       
+
         # enable generate again when it's ready and disable the hardcoded example
 
         self.grid = [[0 for i in range(n)] for j in range(n)]
 
-        self.cages = self.generate(self,n)
+        self.cages = self.generate(n)
         self.n = n
 
         # --- 2D array, each cell position has cage number as its value ---
@@ -33,16 +39,164 @@ class Kenken:
         ]
         """
 
+    def operation(self, operator):
+        """
+        A utility function used in order to determine the operation corresponding
+        to the operator that is given in string format
+        """
+        if operator == '+':
+            return lambda a, b: a + b
+        elif operator == '-':
+            return lambda a, b: a - b
+        elif operator == '*':
+            return lambda a, b: a * b
+        elif operator == '/':
+            return lambda a, b: a / b
+        else:
+            return None
+
+    def adjacent(self, xy1, xy2):
+        """
+        Checks wheither two positions represented in 2D coordinates are adjacent
+        """
+        x1, y1 = xy1
+        x2, y2 = xy2
+
+        dx, dy = x1 - x2, y1 - y2
+
+        return (dx == 0 and abs(dy) == 1) or (dy == 0 and abs(dx) == 1)
 
     #Tarek and Zamala
     def generate(self, size):
         """
-        :param size: the size of the generated grid
-        :return: it creates and returns a random game (the data structure of the game is not decided yet)
+        Generate a random kenken puzzle of the given size
+          * Initially create a latin square of size 'size' and elements the values [1...size]
+          * Shuffle the board by rows and columns in order to get a somewhat random
+            board that still satisfies the different row-col constraint of kenken
+          * Initialize the 'uncaged' set with all cell coordinates
+          * Proceed in creating cliques:
+            * Randomly choose a clique size in the range [1..4]
+            * Set the first cell in the 'uncaged' set in row major order as
+              the root cell of the clique and remove it from the 'uncaged' set
+            * Randomly visit at most 'clique-size' 'uncaged' adjacent cells
+              in random directions while adding them to the current clique
+              and removing them from the 'uncaged' cells
+            * The size of the resulting clique is:
+              * == 1:
+                there is no operation to be performed and the target of the clique
+                is equal to the only element of the clique
+              * == 2:
+                * if the two elements of the clique can be divided without a remainder
+                  then the operation is set to division and the target is the quotient
+                * otherwise, the operation is set to subtraction and the target is the
+                  difference of the elements
+              * >  2:
+               randomly choose an operation between addition and multiplication.
+                The target of the operation is the result of applying the decided
+                operation on all the elements of the clique
+            * Continue until the 'uncaged' set is empty i.e. there is no cell belonging
+              to no clique
         """
-        pass
 
-    
+        board = [[((i + j) % size) + 1 for i in range(size)] for j in range(size)]
+
+        for _ in range(size):
+            shuffle(board)
+
+        for c1 in range(size):
+            for c2 in range(size):
+                if random() > 0.5:
+                    for r in range(size):
+                        board[r][c1], board[r][c2] = board[r][c2], board[r][c1]
+
+        board = {(j + 1, i + 1): board[i][j] for i in range(size) for j in range(size)}
+
+        uncaged = sorted(board.keys(), key=lambda var: var[1])
+
+        cliques = []
+        while uncaged:
+
+            cliques.append([])
+
+            csize = randint(1, 4)
+
+            cell = uncaged[0]
+
+            uncaged.remove(cell)
+
+            cliques[-1].append(cell)
+
+            for _ in range(csize - 1):
+
+                adjs = [other for other in uncaged if self.adjacent(cell, other)]
+
+                cell = choice(adjs) if adjs else None
+
+                if not cell:
+                    break
+
+                uncaged.remove(cell)
+
+                cliques[-1].append(cell)
+
+            csize = len(cliques[-1])
+            if csize == 1:
+                cell = cliques[-1][0]
+                cliques[-1] = ((cell, ), '.', board[cell])
+                continue
+            elif csize == 2:
+                fst, snd = cliques[-1][0], cliques[-1][1]
+                if board[fst] / board[snd] > 0 and not board[fst] % board[snd]:
+                    operator = "/" # choice("+-*/")
+                else:
+                    operator = "-" # choice("+-*")
+            else:
+                operator = choice("+*")
+
+            target = reduce(self.operation(operator), [board[cell] for cell in cliques[-1]])
+
+            cliques[-1] = (tuple(cliques[-1]), operator, int(target))
+
+        #print(cliques)
+        full_dect = {}
+        inside_dect = {}
+        inside_dect["value"] = 0
+        inside_dect["op"] = 0
+        inside_dect["cells"] = []
+        iterator = 1
+        #print(cliques)
+        #print('\n')
+        for i in range(0,len(cliques)):
+            if cliques[i][2] <  0:
+                inside_dect["value"] = abs(cliques[i][2])
+            else:
+                inside_dect["value"] =  cliques[i][2]
+
+            if(cliques[i][1] == '.'):
+                inside_dect["op"] = "none"
+            else:
+                inside_dect["op"] = cliques[i][1]
+
+            temp_list = []
+            for j in cliques[i][0]:
+                #print(j)
+                y = list(j)
+                y[0] = y[0]-1
+                y[1] = y[1]-1
+                x = tuple(y)
+                temp_list.append(x)
+
+            #print(temp_list)
+            inside_dect["cells"] = temp_list
+            full_dect[iterator]=inside_dect.copy()
+        #    print(full_dect[iterator])
+        #    print('\n')
+            iterator= iterator+1
+
+        print(full_dect)
+        return full_dect
+
+
     def Bounding(self, row, col, value):
         """
         Responsible for Column checking, Row checking, and Grid checking
@@ -63,7 +217,7 @@ class Kenken:
 
         return isAllConstraintsApplied
 
-    
+
     def check_row(self, row, value):
         """
         This function returns true iff row has no cell containing value same as the given value,
@@ -84,7 +238,7 @@ class Kenken:
         return isConstraintApplied
 
 
-    
+
     def check_column(self, col, value):
         """
         This function returns true iff col has no cell containing value same as the given value,
@@ -104,21 +258,21 @@ class Kenken:
 
         return isConstraintApplied
 
-    
+
     def check_cage(self, row, col, value):
-         
+
         """This function takes parameters specifies cell position and the value inside this cell,
         check the cage of this cell by searching in cellToCageMap 2D array , then access this cage to
         ensure that this value relative to all other cells in the same cage satisfy cage operation
         and constraint or not. if satisfied it return "True", else it return "False"
         """
         isConstraintApplied =False
-        # search with the row and col (cell position in cellToCageMap 2D array to get cage number 
+        # search with the row and col (cell position in cellToCageMap 2D array to get cage number
         cageNumber = self.cellToCageMap[row][col]
         cageNeededToBeChecked = self.cages.get(cageNumber)
-        # get cellsList of the cage 
+        # get cellsList of the cage
         cellsList = cageNeededToBeChecked['cells']
-        # get cage operation 
+        # get cage operation
         cageOperation = cageNeededToBeChecked['op']
 
         # FreeBie
@@ -128,10 +282,10 @@ class Kenken:
                 isConstraintApplied = True
 
         # ADDITION
-        elif cageOperation == "+" : # cellsList > = 2 
+        elif cageOperation == "+" : # cellsList > = 2
             summationResult = 0
             zerosCount = 0
-            for cell in cellsList: # cell is tuple (1,2) 
+            for cell in cellsList: # cell is tuple (1,2)
                 if (row,col) != cell: # sum all cells except the one Iam checking
                     zerosCount += (self.grid[cell[0]][cell[1]] == 0)
                     summationResult += int(self.grid[cell[0]][cell[1]])
@@ -140,7 +294,7 @@ class Kenken:
             elif not zerosCount and summationResult + int(value) == int(cageNeededToBeChecked['value']):
                 isConstraintApplied = True
 
-        # SUBTRACTION 
+        # SUBTRACTION
         elif cageOperation == "-": # cellsList has only 2 cells according to game Rules
             subtractionResult = 0
             for cell in cellsList:
@@ -156,8 +310,8 @@ class Kenken:
             if abs(subtractionResult) == cageNeededToBeChecked['value']:
                 isConstraintApplied = True
 
-        # MULTIPLICATION 
-        elif cageOperation == "*": # cellsList > = 2 
+        # MULTIPLICATION
+        elif cageOperation == "*": # cellsList > = 2
             multiplicationResult = 1
             zerosCount = 0
             for cell in cellsList:
@@ -172,7 +326,7 @@ class Kenken:
             elif not zerosCount and multiplicationResult * value == cageNeededToBeChecked['value']:
                 isConstraintApplied = True
 
-        # DIVISION 
+        # DIVISION
         elif cageOperation == "/": # cellsList = 2
             divisionResult = 1
             for cell in cellsList:
@@ -191,8 +345,8 @@ class Kenken:
                 isConstraintApplied = True
 
         return isConstraintApplied
-        
-       
+
+
     def mapCellsToCages(self):
         gameSize = len(self.grid)
         cellToCageMap = [ [0]*gameSize for i in range(gameSize)] # --- number of all cells in the game ---
@@ -205,7 +359,7 @@ class Kenken:
 
         return cellToCageMap
 
-    
+
     def solve(self, forward_check = False, arc_consistency=False):
         """
         a wrapper function that calls the recursive backtracking function
@@ -221,7 +375,7 @@ class Kenken:
         elif not forward_check and not arc_consistency:
             self.backtracking()
 
-    
+
     def backtracking(self):
         row, col = self.find_empty()
         # Base case
@@ -275,7 +429,7 @@ class Kenken:
     def print(self):
         return self.grid
 
-    
+
     def find_empty(self):
         """
         :return: first empty position to use it next
@@ -291,7 +445,7 @@ class Kenken:
                     # --- return first empty position to work on it next ---
                     return (row,col)
         return (None,None)
-    
+
     def findListOfEmptyPositions(self):
         """
         This list return list of tuples containing all cells' positions has "0"(zero) value.
@@ -311,6 +465,3 @@ class Kenken:
                     emptyPositionsList.append((row,col))
 
         return emptyPositionsList
-
-
-
