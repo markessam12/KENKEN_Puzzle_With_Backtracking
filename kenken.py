@@ -1,10 +1,13 @@
 import random
+import hardCodedExamples
 from sys import stderr, stdin
 from itertools import product, permutations
 from functools import reduce
 from random import seed, random, shuffle, randint, choice
 from time import time
 from csv import writer
+import copy
+from collections import deque
 
 
 class Kenken:
@@ -22,11 +25,12 @@ class Kenken:
 
         self.grid = [[0 for i in range(n)] for j in range(n)]
 
-        self.cages = self.generate(n)
+        self.cages, self.ans = self.generate(n)
         self.n = n
 
         # --- 2D array, each cell position has cage number as its value ---
         self.cellToCageMap = self.mapCellsToCages()
+        
 
         #3D list for the domain of available values for each cell (1d for each cell in the 2d grid)
         self.domains = [[[True for i in range(n)] for j in range(n)] for k in range(n)]
@@ -38,6 +42,8 @@ class Kenken:
         [[True, True, True], [True, True, True], [True, True, True]]
         ]
         """
+
+        self.queues = deque()
 
     def operation(self, operator):
         """
@@ -66,7 +72,6 @@ class Kenken:
 
         return (dx == 0 and abs(dy) == 1) or (dy == 0 and abs(dx) == 1)
 
-    #Tarek and Zamala
     def generate(self, size):
         """
         Generate a random kenken puzzle of the given size
@@ -157,15 +162,12 @@ class Kenken:
 
             cliques[-1] = (tuple(cliques[-1]), operator, int(target))
 
-        #print(cliques)
         full_dect = {}
         inside_dect = {}
         inside_dect["value"] = 0
         inside_dect["op"] = 0
         inside_dect["cells"] = []
         iterator = 1
-        #print(cliques)
-        #print('\n')
         for i in range(0,len(cliques)):
             if cliques[i][2] <  0:
                 inside_dect["value"] = abs(cliques[i][2])
@@ -179,23 +181,17 @@ class Kenken:
 
             temp_list = []
             for j in cliques[i][0]:
-                #print(j)
                 y = list(j)
                 y[0] = y[0]-1
                 y[1] = y[1]-1
                 x = tuple(y)
                 temp_list.append(x)
 
-            #print(temp_list)
             inside_dect["cells"] = temp_list
             full_dect[iterator]=inside_dect.copy()
-        #    print(full_dect[iterator])
-        #    print('\n')
             iterator= iterator+1
 
-        print(full_dect)
-        return full_dect
-
+        return full_dect, board
 
     def Bounding(self, row, col, value):
         """
@@ -217,7 +213,6 @@ class Kenken:
 
         return isAllConstraintsApplied
 
-
     def check_row(self, row, value):
         """
         This function returns true iff row has no cell containing value same as the given value,
@@ -237,8 +232,6 @@ class Kenken:
 
         return isConstraintApplied
 
-
-
     def check_column(self, col, value):
         """
         This function returns true iff col has no cell containing value same as the given value,
@@ -257,7 +250,6 @@ class Kenken:
                 isConstraintApplied = False
 
         return isConstraintApplied
-
 
     def check_cage(self, row, col, value):
 
@@ -300,10 +292,7 @@ class Kenken:
             for cell in cellsList:
                 if (row,col) != cell : # I have this cell value passed to my function
                     if self.grid[cell[0]][cell[1]] == 0:
-                        if int(value) == cageNeededToBeChecked['value']:
-                            isConstraintApplied = False
-                        else:
-                            isConstraintApplied = True
+                        isConstraintApplied = True
                         break
                     subtractionResult = int(value) - int(self.grid[cell[0]][cell[1]])
             # check if constraint is applied
@@ -346,8 +335,10 @@ class Kenken:
 
         return isConstraintApplied
 
-
     def mapCellsToCages(self):
+        """
+        :return: A function return a 2d list with the cage number at each cell position
+        """
         gameSize = len(self.grid)
         cellToCageMap = [ [0]*gameSize for i in range(gameSize)] # --- number of all cells in the game ---
         for cage in self.cages:
@@ -359,7 +350,6 @@ class Kenken:
 
         return cellToCageMap
 
-
     def solve(self, forward_check = False, arc_consistency=False):
         """
         a wrapper function that calls the recursive backtracking function
@@ -367,16 +357,18 @@ class Kenken:
         :param arc_consistency: enable arc consistency mode
         :return:
         """
-
+        # print(self.cages)
         if forward_check and not arc_consistency:
             self.backtracking_FC()
         elif forward_check and arc_consistency:
-            pass
+            self.backtracking_AC_FC()
         elif not forward_check and not arc_consistency:
             self.backtracking()
 
-
     def backtracking(self):
+        """
+        :return: a recursive function that return True when a solution is found
+        """
         row, col = self.find_empty()
         # Base case
         if row is None:
@@ -395,6 +387,9 @@ class Kenken:
         return False
 
     def backtracking_FC(self):
+        """
+        :return: a recursive function that return True when a solution is found that supports forward checking
+        """
         row, col = self.find_empty()
         # Base case
         if row is None:
@@ -418,17 +413,93 @@ class Kenken:
         self.grid[row][col] = 0
         return False
 
+    def backtracking_AC_FC(self):
+        """
+        :return: A function that reduces the domains of variables using arc consistency and find the unique solution using backtracking and forward checking
+        """
+        pass
+
+    def constrain_check(self,ix,iy,jx,jy,a,b,constrain_type):
+        """
+        :param ix: row of variable Xi
+        :param iy: col of variable Xi
+        :param jx: row of variable Xj
+        :param jy: col of variable Xj
+        :param a: value of Xi in it's current domain
+        :param b: value of Xj in it's current domain
+        :param constrain_type: The type of the constraints between the two variables
+        :return: boolean value that is True when a and b satisfy the constrain between Xi and Xj
+        """
+        result = True
+        if constrain_type == '=':
+            if (ix == jx or iy == jy) and a == b:
+                result = False
+        else:
+            cage_number = self.cellToCageMap[ix][iy]
+            if constrain_type == '+':
+                result = (a + b) <= self.cages[cage_number]["value"]
+            elif constrain_type == '-':
+                result = abs(a - b) == self.cages[cage_number]["value"]
+            elif constrain_type == '*':
+                result = (a * b) <= self.cages[cage_number]["value"]
+            elif constrain_type == '/':
+                result = (max(a,b)/min(a,b)) == self.cages[cage_number]["value"]
+
+        return result
+
+    def revise(self, Xi,Xj,constrain_type):
+        """
+        :param Xi: First variable of the relation
+        :param Xj: Second variable of the relation
+        :param constrain_type: type of the relation
+        :return:boolean that is true if the domain of Xi changed
+        """
+        changed = False
+        for a in range(self.n):
+            found = False
+            if self.domains[Xi[0]][Xi[1]][a]:
+                for b in range(self.n):
+                    if self.domains[Xj[0]][Xj[1]][b]:
+                        if self.constrain_check(Xi[0],Xi[1],Xj[0],Xj[1],a+1,b+1,constrain_type):
+                            found = True
+                            break
+                if not found:
+                    self.domains[Xi[0]][Xi[1]][a] = False
+                    changed = True
+        return changed
+
+    def AC3(self):
+        """
+        :return: A function that changes the self.domains (implementation of arc consistency algorithm)
+        """
+        pass
+
     def forward_check(self, row, col, value, setting=False):
+        """
+        :param row: row of the current variable
+        :param col: col of the current variable
+        :param value: value of the current variable
+        :param setting: boolean variable that set the function to enable or disable the domains
+        :return:
+        """
         for i in range(self.n):
             self.domains[i][col][value] = setting
             self.domains[row][i][value] = setting
+        cage = self.cellToCageMap[row][col]
+        # for r, c in self.cages[cage]['cells']:
+        #     if (r != row) and (c != col):
+        #         for v in range(self.n):
+        #             # check if the current value is in the domain of the cell
+        #             if self.domains[r][c][v] ^ setting:
+        #                 if self.Bounding(r, c, v+1) == setting:
+        #                     self.domains[r][c][v] = setting
 
-
-
-    #Zamala
     def print(self):
-        return self.grid
-
+        """
+        :return: printing funtion for debugging
+        """
+        print(self.grid)
+        print(self.ans)
 
     def find_empty(self):
         """
