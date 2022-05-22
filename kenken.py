@@ -467,6 +467,26 @@ class Kenken:
                     self.domains[Xi[0]][Xi[1]][a] = False
                     changed = True
         return changed
+   
+    def fill_queue(self):
+        """
+        :return: function that fills self.queues with the arcs between all the variables
+        """
+        for x in range(self.n):
+            for y in range(self.n):
+                for i in range(self.n):
+                    # arcs of Xi with other variables in it's col
+                    if y != i :
+                        self.queues.append(([x, y], [x,i], '='))
+                    # arcs of Xi with other variables in it's row
+                    if x != i:
+                        self.queues.append(([x, y], [i, y], '='))
+                cage_number = self.cellToCageMap[x][y]
+                # arcs of Xi with other variables in it's cage
+                for cell in self.cages[cage_number]["cells"]:
+                    if self.cages[cage_number]['op'] != 'none':
+                        if not (cell[0] == x and cell[1] == y):
+                            self.queues.append(([x, y], [cell[0], cell[1]], self.cages[cage_number]['op']))
 
     def AC3(self):
         """
