@@ -413,11 +413,25 @@ class Kenken:
         self.grid[row][col] = 0
         return False
 
-    def backtracking_AC_FC(self):
+  def backtracking_AC_FC(self):
         """
         :return: A function that reduces the domains of variables using arc consistency and find the unique solution using backtracking and forward checking
         """
-        pass
+        # solve uniray constraints first:
+        for cage in self.cages:
+            if self.cages[cage]["op"] == 'none':
+                row, col = self.cages[cage]["cells"][0]
+                value = self.cages[cage]["value"]
+                for i in range(self.n):
+                    self.domains[row][col][i] = False
+                self.forward_check(row, col, value - 1, setting=False)
+                self.domains[row][col][value - 1] = True
+        # Fill queue with all the releationships
+        self.fill_queue()
+        # Solve using AC3
+        self.AC3()
+        # Find final unique solution using backtracking and forward checking
+        self.backtracking_FC()
 
     def constrain_check(self,ix,iy,jx,jy,a,b,constrain_type):
         """
@@ -492,7 +506,35 @@ class Kenken:
         """
         :return: A function that changes the self.domains (implementation of arc consistency algorithm)
         """
-        pass
+        # continue while Queue is not empty
+        while len(self.queues):
+            # select and delete an arc (Xi, Xj) from the queue
+            arc = self.queues.popleft()
+            # if Revise caused any changes to the domains then add all arcs that touch Xi to the queue
+            if self.revise(arc[0],arc[1],arc[2]):
+                x,y = arc[0]
+                for i in range(self.n):
+                    # arcs of Xi with other variables in it's col
+                    if y != i :
+                        if not ([x, y], [x,i], '=') in self.queues:
+                            self.queues.append(([x, y], [x,i], '='))
+                        if not ([x, i], [x, y], '=') in self.queues:
+                            self.queues.append(([x, i], [x, y], '='))
+                    # arcs of Xi with other variables in it's row
+                    if x != i:
+                        if not ([x, y], [i, y], '=') in self.queues:
+                            self.queues.append(([x, y], [i, y], '='))
+                        if not ([i, y], [x, y], '=') in self.queues:
+                            self.queues.append(([i, y], [x, y], '='))
+                cage_number = self.cellToCageMap[x][y]
+                # arcs of Xi with other variables in it's cage
+                for cell in self.cages[cage_number]["cells"]:
+                    if self.cages[cage_number]['op'] != 'none':
+                        if not (cell[0] == x and cell[1] == y):
+                            if not ([x, y], [cell[0], cell[1]], self.cages[cage_number]['op']) in self.queues:
+                                self.queues.append(([x, y], [cell[0], cell[1]], self.cages[cage_number]['op']))
+                            if not ([cell[0], cell[1]],[x, y], self.cages[cage_number]['op']) in self.queues:
+                                self.queues.append(([cell[0], cell[1]],[x, y], self.cages[cage_number]['op']))
 
     def forward_check(self, row, col, value, setting=False):
         """
