@@ -413,7 +413,7 @@ class Kenken:
         self.grid[row][col] = 0
         return False
 
-  def backtracking_AC_FC(self):
+    def backtracking_AC_FC(self):
         """
         :return: A function that reduces the domains of variables using arc consistency and find the unique solution using backtracking and forward checking
         """
