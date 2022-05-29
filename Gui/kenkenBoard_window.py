@@ -177,11 +177,13 @@ class KenkenGameWindow(QMainWindow):
                 answer = self.solution[row-1][col-1]
                 print("answer = ", answer)
                 cellLineEdit.setText(str(answer))
+
+            if counter > self.gameSize:
+                pass
             else:
                 self.hintButtonFunction()
                 counter +=1
-            if counter > self.gameSize:
-                pass
+
         except Exception as e:
             print(e)
 
