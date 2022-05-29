@@ -164,13 +164,13 @@ class KenkenGameWindow(QMainWindow):
 
         return isSolved
 
-    def hintButtonFunction(self):
+    def hintButtonFunction(self,counter = 0):
         try:
-            counter = 0
             domainList = [str(i) for i in range(1, self.gameSize + 1)]
             row = int(random.choice(domainList))
             col = int(random.choice(domainList))
-
+            if counter > self.gameSize:
+                pass
             cellLineEdit = self.temporaryGameBoard.cellWidget(row-1, col-1).solutionLineEdit
             print("cell Text = ",cellLineEdit.text())
             if cellLineEdit.text() == " ":
@@ -178,11 +178,10 @@ class KenkenGameWindow(QMainWindow):
                 print("answer = ", answer)
                 cellLineEdit.setText(str(answer))
 
-            if counter > self.gameSize:
-                pass
             else:
-                self.hintButtonFunction()
-                counter +=1
+                counter += 1
+                self.hintButtonFunction(counter = counter)
+
 
         except Exception as e:
             print(e)
