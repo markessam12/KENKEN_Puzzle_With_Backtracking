@@ -102,12 +102,14 @@ class MainWindow(QMainWindow):
 
         aboutString = """Kenken puzzle solver made by ASU Engineers:
             
-            * Engy Khalaf Ahmed                     1700301@eng.asu.edu.eg
-            * Mark Essam Fares                      1701086@eng.asu.edu.eg
-            * Mark Mourad Gamil                     1701088@eng.asu.edu.eg
-            * Eman Salah Shabaan                  1000024@eng.asu.edu.eg
-            * Mohamed Tarek Mohamed           1701220@eng.asu.edu.eg
-            * Mohamed AbdelAzeem                1701235@eng.asu.edu.eg
+                 Name                                     StudentID
+                 ------                                       ---------
+            * Engy Khalaf Ahmed                     1700301
+            * Mark Essam Fares                      1701086
+            * Mark Mourad Gamil                     1701088
+            * Eman Salah Shabaan                  1000024
+            * Mohamed Tarek Mohamed          1701220
+            * Mohamed AbdelAzeem                1701235
       
       
             
