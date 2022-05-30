@@ -16,6 +16,9 @@ t1 = time.time()
 x_axis = [3 ,4,5,6,7 ]
 y_axis_forward = []
 
+number_Of_iterations = 10
+
+
 y_axis_arc = []
 y_axis_backtracking = []
 
@@ -25,7 +28,7 @@ avg_time_value =0
 
 #forward_check
 for size in x_axis:
-    for k in range(0,10): #10 times
+    for k in range(0,number_Of_iterations): #10 times
         game1 = Kenken(size)
         game1.solve(forward_check = True, arc_consistency = False)
         print(size)
@@ -40,11 +43,12 @@ for size in x_axis:
     y_axis_forward.append(avg_time_value)
 
 
+t1 = time.time()
 #arc_consistency
 for size in x_axis:
-    for k in range(0,10): #10 times
+    for k in range(0,number_Of_iterations): #10 times
         game1 = Kenken(size)
-        game1.solve(forward_check = False, arc_consistency = True )
+        game1.solve(forward_check = True, arc_consistency = True )
         print(size)
         print(k)
         print((time.time()-t1))
@@ -56,9 +60,11 @@ for size in x_axis:
     avg_time.clear()
     y_axis_arc.append(avg_time_value)
 
+
+t1 = time.time()
 #Backtracking
 for size in x_axis:
-    for k in range(0,10): #10 times
+    for k in range(0,number_Of_iterations): #10 times
         game1 = Kenken(size)
         game1.solve(forward_check = False, arc_consistency = False )
         print(size)
@@ -86,18 +92,3 @@ plt.xticks(new_list)
 
 plt.legend()
 plt.show()
-"""
-
-# 3*3  arc_consistency
-for k in range(0,10): #10 times
-    game1 = Kenken(3)
-    #arc_consistency
-    game1.solve(forward_check = False, arc_consistency = True)
-    print("game dim:", i )
-    print("game alg" ,j)
-    print("game num" ,k)
-    print((time.time()-t1))
-    y_axis.append((time.time()-t1))
-    game1.print()
-    print("#############################################################################################################################################################")
-"""
