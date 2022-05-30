@@ -2,84 +2,58 @@ from kenken import Kenken
 import matplotlib.pyplot as plt
 import time
 import math
+import sys
 
-
-# Python program to get average of a list
-def Average(lst):
-    return sum(lst) / len(lst)
-
-
-t1 = time.time()
-
+def progress(j):
+    sys.stdout.write('\r')
+    # the exact output you're looking for:
+    sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
+    sys.stdout.flush()
 
 # available dimensions
-x_axis = [3 ,4,5,6,7 ]
-y_axis_forward = []
+x_axis = [3 , 4, 5, 6, 7]
 
 number_Of_iterations = 10
 
-
 y_axis_arc = []
 y_axis_backtracking = []
-
+y_axis_forward = []
 
 avg_time = []
-avg_time_value =0
+avg_timeBC = 0
+avg_timeFC = 0
+avg_timeAC = 0
+i = 0
+n = 3 * number_Of_iterations * len(x_axis)
 
 #forward_check
 for size in x_axis:
-    for k in range(0,number_Of_iterations): #10 times
+    for k in range(0, number_Of_iterations):
         game1 = Kenken(size)
-        game1.solve(forward_check = True, arc_consistency = False)
-        print(size)
-        print(k)
-        print((time.time()-t1))
-        avg_time.append((time.time()-t1))
-        game1.print()
-        print("#############################################################################################################################################################")
+        t1 = time.time()
+        game1.solve(forward_check = False, arc_consistency = False)
+        avg_timeBC += (time.time()-t1)
+        i += 1
+        progress(i / n)
 
-    avg_time_value = Average(avg_time)
-    avg_time.clear()
-    y_axis_forward.append(avg_time_value)
+        t1 = time.time()
+        game1.solve(forward_check=True, arc_consistency=False)
+        avg_timeFC += (time.time()-t1)
+        i += 1
+        progress(i / n)
 
+        t1 = time.time()
+        game1.solve(forward_check=True, arc_consistency=True)
+        avg_timeAC += (time.time()-t1)
+        i += 1
+        progress(i/n)
 
-t1 = time.time()
-#arc_consistency
-for size in x_axis:
-    for k in range(0,number_Of_iterations): #10 times
-        game1 = Kenken(size)
-        game1.solve(forward_check = True, arc_consistency = True )
-        print(size)
-        print(k)
-        print((time.time()-t1))
-        avg_time.append((time.time()-t1))
-        game1.print()
-        print("#############################################################################################################################################################")
-
-    avg_time_value = Average(avg_time)
-    avg_time.clear()
-    y_axis_arc.append(avg_time_value)
-
-
-t1 = time.time()
-#Backtracking
-for size in x_axis:
-    for k in range(0,number_Of_iterations): #10 times
-        game1 = Kenken(size)
-        game1.solve(forward_check = False, arc_consistency = False )
-        print(size)
-        print(k)
-        print((time.time()-t1))
-        avg_time.append((time.time()-t1))
-        game1.print()
-        print("#############################################################################################################################################################")
-
-    avg_time_value = Average(avg_time)
-    avg_time.clear()
-    y_axis_backtracking.append(avg_time_value)
-
-
-
+    y_axis_backtracking.append(avg_timeBC/number_Of_iterations)
+    y_axis_forward.append(avg_timeFC/number_Of_iterations)
+    y_axis_arc.append(avg_timeAC/number_Of_iterations)
+    avg_timeBC = 0
+    avg_timeFC = 0
+    avg_timeAC = 0
 
 plt.ylabel('Average time')
 plt.plot(x_axis, y_axis_forward, color='r', label='forward_check')

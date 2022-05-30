@@ -1,12 +1,6 @@
 import random
-import hardCodedExamples
-from sys import stderr, stdin
-from itertools import product, permutations
 from functools import reduce
 from random import seed, random, shuffle, randint, choice
-from time import time
-from csv import writer
-import copy
 from collections import deque
 
 
@@ -16,13 +10,6 @@ class Kenken:
         grid: 2d list of current existing numbers, zeros for empty cells
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
         """
-        #Zamala needs to type a hardcoded example here for trials
-
-        #Solution is [[1,3,2],[3,2,1],[2,1,3]]
-
-
-        # enable generate again when it's ready and disable the hardcoded example
-
         self.grid = [[0 for i in range(n)] for j in range(n)]
 
         self.cages, self.ans = self.generate(n)
@@ -357,7 +344,8 @@ class Kenken:
         :param arc_consistency: enable arc consistency mode
         :return:
         """
-        # print(self.cages)
+        self.grid = [[0 for i in range(self.n)] for j in range(self.n)]
+        self.domains = [[[True for i in range(self.n)] for j in range(self.n)] for k in range(self.n)]
         if forward_check and not arc_consistency:
             self.backtracking_FC()
         elif forward_check and arc_consistency:
@@ -511,7 +499,7 @@ class Kenken:
             # select and delete an arc (Xi, Xj) from the queue
             arc = self.queues.popleft()
             # if Revise caused any changes to the domains then add all arcs that touch Xi to the queue
-            if self.revise(arc[0],arc[1],arc[2]):
+            if self.revise(arc[0], arc[1], arc[2]):
                 x,y = arc[0]
                 for i in range(self.n):
                     # arcs of Xi with other variables in it's col
