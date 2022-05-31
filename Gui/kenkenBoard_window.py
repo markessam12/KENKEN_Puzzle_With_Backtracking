@@ -8,8 +8,8 @@ class KenkenGameWindow(QMainWindow):
 
     # 40 colors
     colorsList = [
-        '#fd9b6b','#bbff9e','#fcb295','#f4e409','#00a5cf','#ffb100','#56f1de','#34bb9e'
-        '#f3c178','#d5a473','#f2ca3a','#f1489c','#63c132','#07beb8','#f53cc9','#f79f79',
+        '#fd9b6b','#34bb9e','#bbff9e','#fcb295','#f4e409','#00a5cf','#ffb100','#56f1de',
+        '#f3c178','#f2ca3a','#f1489c','#63c132','#07beb8','#f53cc9','#f79f79','#d5a473',
         '#8c5383','#75f4f4','#d999d9','#e3f09b','#aad922','#c1b2ab','#d2bb6a','#e952de',
         '#a7a2a9','#bacba9','#fa7921','#b9a44c','#c4a287','#616283','#d4e725','#a44a3f',
         '#d4e09b','#b5f44a','#a1d538','#70ee9c','#aaefdf','#8f3985','#62714f','#5bff5b'
@@ -202,3 +202,7 @@ class KenkenGameWindow(QMainWindow):
         for row in range(self.temporaryGameBoard.rowCount()):
             for col in range(self.temporaryGameBoard.columnCount()):
                 self.temporaryGameBoard.cellWidget(row,col).solutionLineEdit.setText(" ")
+
+    def exitItemAction(self):
+        QApplication.quit()
+        sys.exit()

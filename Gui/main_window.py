@@ -240,8 +240,9 @@ class MainWindow(QMainWindow):
         return self.algorithmType
 
     def exitItemAction(self):
+        sys.exit()
         QApplication.quit()
 
-    #TODO:
+
 
 

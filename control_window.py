@@ -114,7 +114,9 @@ def main():
 
         flagX = app.exec_()
 
+    app.quit()
     sys.exit(flagX)
+
 
 
 if __name__ == '__main__':

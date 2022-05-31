@@ -145,11 +145,11 @@ class BoardCellWidget(QWidget):
         font = Font(fontType = "Helvetica [Cronyx]",size = 13)
 
         self.lineEdit = StandardLineEdit(cage = True)
-        self.solutionLineEdit = StandardLineEdit(ReadOnly= False,fontSize= 16)
+        self.solutionLineEdit = StandardLineEdit(ReadOnly= True,fontSize= 16)
         # self.solutionLineEdit.setValidator(QIntValidator(0,initialDomainSize))
 
         if color is not None:
-            self.solutionLineEdit = StandardLineEdit(ReadOnly=False, fontSize=16,borderColor= color)
+            self.solutionLineEdit = StandardLineEdit(ReadOnly=True, fontSize=16,borderColor= color)
             self.lineEdit.setStyleSheet("QLineEdit" "{" "background : %s ;" "}"
                                         "QLineEdit""{""border : 0px %s;""}"%(color,color))
             self.solutionLineEdit.setStyleSheet("QLineEdit" "{" "background : %s ;" "}"
