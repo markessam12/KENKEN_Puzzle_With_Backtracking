@@ -392,7 +392,7 @@ class Kenken:
             # check if the current value is in the domain of the cell
             if self.domains[row][col][value]:
                 if self.controller.demonstrate:
-                    self.controller.setCell(row, col, value)
+                    self.controller.setCell(row, col, value + 1)
                 # check if the current value will obey all constrains
                 if self.Bounding(row, col, value + 1):
                     self.grid[row][col] = value + 1

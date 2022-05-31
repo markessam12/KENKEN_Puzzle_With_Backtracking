@@ -13,7 +13,7 @@ class Controller:
     def __init__(self):
 
         self.toolName = "ASU Kenken Solver"
-        self.toolIcon = 'Images/kenkenIcon.PNG'
+        self.toolIcon = 'Gui/Images/kenkenIcon.PNG'
         self.demonstrate = False
         self.demoButtonCounter = 0
         self.timeToSleep = 0.4
@@ -84,18 +84,21 @@ class Controller:
         time.sleep(self.timeToSleep)
 
     def hintButtonFunction(self):
+        self.demonstrate = True
         self.demoButtonCounter += 1
         if (self.demoButtonCounter > 3):
             # decrease speed time to its ititialized value again
             self.clearDemo()
         self.timeToSleep = self.timeToSleep / 2
-        self.demonstrate = True
+
 
         self.solveGameFunction()
 
     def clearDemo(self):
         # initialize time to solve to be as first time again
         self.timeToSleep = 0.4
+        self.demoButtonCounter = 0
+        self.demonstrate = False
 
 def main():
 
