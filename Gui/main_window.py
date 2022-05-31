@@ -113,7 +113,8 @@ class MainWindow(QMainWindow):
       
       
             
-        Submitted to Prof. Dr. Manal Morad """
+        Submitted to Eng. Ahmed Mostafa Soliman
+        Course Instructor Prof. Dr. Manal Morad Zaki """
 
         self.helpLabel.appendPlainText(aboutString)
         self.helpLabel.setFont(QFont("Sanserif", 10))
