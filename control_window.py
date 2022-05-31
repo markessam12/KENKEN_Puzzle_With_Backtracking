@@ -97,10 +97,6 @@ class Controller:
         # initialize time to solve to be as first time again
         self.timeToSleep = 0.4
 
-
-
-
-
 def main():
 
     app = QApplication(sys.argv)

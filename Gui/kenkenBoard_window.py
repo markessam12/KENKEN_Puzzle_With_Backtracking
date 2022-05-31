@@ -8,11 +8,11 @@ class KenkenGameWindow(QMainWindow):
 
     # 40 colors
     colorsList = [
-        '#fd9b6b','#34bb9e','#bbff9e','#fcb295','#f4e409','#00a5cf','#ffb100','#56f1de',
-        '#f3c178','#f2ca3a','#f1489c','#63c132','#07beb8','#f53cc9','#f79f79','#d5a473',
-        '#8c5383','#75f4f4','#d999d9','#e3f09b','#aad922','#c1b2ab','#d2bb6a','#e952de',
-        '#a7a2a9','#bacba9','#fa7921','#b9a44c','#c4a287','#616283','#d4e725','#a44a3f',
-        '#d4e09b','#b5f44a','#a1d538','#70ee9c','#aaefdf','#8f3985','#62714f','#5bff5b'
+        '#fd9b6b','#7eb4f4','#89c371','#fcb295','#f4e409','#5bff5b','#ffb100','#56f1de',
+        '#e952de','#f3c178','#f2ca3a','#f1489c','#63c132','#07beb8','#00db00','#f79f79',
+        '#d5a473','#8c5383','#8f3985','#75f4f4','#d999d9','#e3f09b','#aad922','#c1b2ab',
+        '#a7a2a9','#34bb9e','#fa7921','#b9a44c','#c4a287','#616283','#d4e725','#a44a3f',
+        '#d4e09b','#b5f44a','#a1d538','#70ee9c','#aaefdf','#00a5cf','#62714f','#bacba9'
     ]
 
     def __init__(self,toolName,toolIcon):
