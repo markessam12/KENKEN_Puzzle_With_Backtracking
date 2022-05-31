@@ -1,13 +1,12 @@
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from main_window import MainWindow
-from kenkenBoard_window import KenkenGameWindow
+from PyQt5.QtWidgets import QApplication
+from Gui.main_window import MainWindow
+from Gui.kenkenBoard_window import KenkenGameWindow
 from kenken import Kenken
 import time
 import sys
-
-
 
 class Controller:
 
@@ -15,6 +14,9 @@ class Controller:
 
         self.toolName = "ASU Kenken Solver"
         self.toolIcon = 'Images/kenkenIcon.PNG'
+        self.demonstrate = False
+        self.demoButtonCounter = 0
+        self.timeToSleep = 0.4
 
         self.main_window = MainWindow(self.toolName,self.toolIcon)
 
@@ -31,7 +33,7 @@ class Controller:
         self.gameSize = self.main_window.getGameSize()
         self.gameAlgorithm = self.main_window.getGameAlgorithmType()
 
-        self.kenkenSolver = Kenken(self.gameSize)
+        self.kenkenSolver = Kenken(self.gameSize,self)
         cagesDict = self.kenkenSolver.getKenkenCagesDict()
 
         self.kenkenWindow = KenkenGameWindow(self.toolName, self.toolIcon)
@@ -41,10 +43,11 @@ class Controller:
             self.kenkenWindow.createKenkenGameLayout(gameSize= self.gameSize,cagesDict=cagesDict)
             self.kenkenWindow.show()
 
-            self.solveGameFunction()
+            # self.solveGameFunction()
             self.kenkenWindow.backButton.clicked.connect(self.backButtonFunction)
             self.kenkenWindow.solveButton.clicked.connect(self.printSolution)
             self.kenkenWindow.checkButton.clicked.connect(self.hintButtonFunction)
+            self.kenkenWindow.ClearGame.triggered.connect(self.clearDemo)
 
     def backButtonFunction(self):
         self.kenkenWindow.hide()
@@ -70,12 +73,29 @@ class Controller:
         self.kenkenWindow.setGameFinalSolution(solution=self.solvedGrid)
 
     def printSolution(self):
+        self.solveGameFunction()
         self.kenkenWindow.printFinalSolution(solution = self.solvedGrid)
 
+    def setCell(self, row, col, value):
+        self.kenkenWindow.setCellWindow(row, col, value)
+
+        QApplication.processEvents()
+
+        time.sleep(self.timeToSleep)
 
     def hintButtonFunction(self):
-        self.kenkenWindow.hintButtonFunction()
-        pass
+        self.demoButtonCounter += 1
+        if (self.demoButtonCounter > 3):
+            # decrease speed time to its ititialized value again
+            self.clearDemo()
+        self.timeToSleep = self.timeToSleep / 2
+        self.demonstrate = True
+
+        self.solveGameFunction()
+
+    def clearDemo(self):
+        # initialize time to solve to be as first time again
+        self.timeToSleep = 0.4
 
 
 

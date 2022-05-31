@@ -1,4 +1,4 @@
-from pyQt5_style import *
+from Gui.pyQt5_style import *
 import time
 import random
 
@@ -8,10 +8,11 @@ class KenkenGameWindow(QMainWindow):
 
     # 40 colors
     colorsList = [
-        '#fd9b6b','#bbff9e','#fcb295','#f4e409','#00a5cf','#f1489c','#ffb100','#56f1de',
-        '#f3c178','#d5a473','#f2ca3a','#34bb9e','#63c132','#aaefdf','#f53cc9','#f79f79','#8c5383','#75f4f4','#d999d9',
-        '#e3f09b','#aad922','#c1b2ab','#f5eccd','#e952de','#a7a2a9','#bacba9','#fa7921','#b9a44c','#c4a287',
-        '#616283','#bfcc49','#a44a3f','#d4e09b','#b5f44a','#a1d538','#70ee9c','#07beb8','#8f3985','#62714f','#5bff5b'
+        '#fd9b6b','#bbff9e','#fcb295','#f4e409','#00a5cf','#ffb100','#56f1de','#34bb9e'
+        '#f3c178','#d5a473','#f2ca3a','#f1489c','#63c132','#07beb8','#f53cc9','#f79f79',
+        '#8c5383','#75f4f4','#d999d9','#e3f09b','#aad922','#c1b2ab','#d2bb6a','#e952de',
+        '#a7a2a9','#bacba9','#fa7921','#b9a44c','#c4a287','#616283','#d4e725','#a44a3f',
+        '#d4e09b','#b5f44a','#a1d538','#70ee9c','#aaefdf','#8f3985','#62714f','#5bff5b'
     ]
 
     def __init__(self,toolName,toolIcon):
@@ -20,9 +21,16 @@ class KenkenGameWindow(QMainWindow):
         self.setWindowTitle(toolName)
         self.setWindowIcon(QIcon(toolIcon))
         self.kenkenGameLayout = Layout()
-        self.backButton = PushButton(buttonText=" Back", picturePath="Images/backButton.ico")
-        self.checkButton = PushButton(buttonText=" Hint", picturePath="Images/checkButton.png")
-        self.solveButton = PushButton(buttonText=" Solve", picturePath="Images/solve.ico")
+
+        # menu bar
+        self.menuBar = QMenuBar(self)
+        self.setMenuBar(self.menuBar)
+        self.fileMenu = self.menuBar.addMenu('File')
+
+        self.ClearGame = QAction('Clear Board', self)
+        self.ClearGame.setIcon(QIcon('Images/clear.png'))
+        self.fileMenu.addAction(self.ClearGame)
+        self.ClearGame.triggered.connect(self.ClarGameBoard)
 
         self.kenkenWidget = Widget()
         # ---window size depending on gameSize ---
@@ -55,7 +63,7 @@ class KenkenGameWindow(QMainWindow):
 
         # ---temporaryButtons ---
         backButton = PushButton(buttonText=" Back", picturePath="Images/backButton.ico")
-        checkButton = PushButton(buttonText=" Hint", picturePath="Images/checkButton.png")
+        checkButton = PushButton(buttonText=" Demo", picturePath="Images/checkButton.png")
         solveButton = PushButton(buttonText=" Solve", picturePath="Images/solve.ico")
 
         self.backButton = backButton
@@ -145,9 +153,10 @@ class KenkenGameWindow(QMainWindow):
         for row in range(self.temporaryGameBoard.rowCount()):
             for col in range(self.temporaryGameBoard.columnCount()):
                 self.temporaryGameBoard.cellWidget(row,col).solutionLineEdit.setText(str(solution[row][col]))
-                #TODO: I want to animate displaying values in each cell. I want to make 1st value display and delay 1 sec,
-                # then display the next value and so on.
 
+
+    def setCellWindow(self, row, col, value):
+        self.temporaryGameBoard.cellWidget(row,col).solutionLineEdit.setText(str(value))
 
     def checkSolutionButtonFunction(self,solution):
         """ referenceSolution of Solver"""
@@ -172,10 +181,10 @@ class KenkenGameWindow(QMainWindow):
             if counter > self.gameSize:
                 pass
             cellLineEdit = self.temporaryGameBoard.cellWidget(row-1, col-1).solutionLineEdit
-            print("cell Text = ",cellLineEdit.text())
+            # print("cell Text = ",cellLineEdit.text())
             if cellLineEdit.text() == " ":
                 answer = self.solution[row-1][col-1]
-                print("answer = ", answer)
+                # print("answer = ", answer)
                 cellLineEdit.setText(str(answer))
 
             else:
@@ -188,3 +197,8 @@ class KenkenGameWindow(QMainWindow):
 
     def setGameFinalSolution(self,solution):
         self.solution = solution
+
+    def ClarGameBoard(self):
+        for row in range(self.temporaryGameBoard.rowCount()):
+            for col in range(self.temporaryGameBoard.columnCount()):
+                self.temporaryGameBoard.cellWidget(row,col).solutionLineEdit.setText(" ")

@@ -92,13 +92,13 @@ class GameBoardLayout(QVBoxLayout):
         self.gameBoard = GameBoardTable(gameSize)
 
 class StandardLineEdit(QLineEdit):
-    def __init__(self,text = " ",ReadOnly = True, fontSize = None,borderColor = None):
+    def __init__(self,text = " ",ReadOnly = True, fontSize = None,borderColor = None,cage = False):
         super().__init__()
         self.setText(text)
         self.setReadOnly(ReadOnly)
         self.adjustSize()
         self.setFixedHeight(53)
-        if ReadOnly: # value + op
+        if cage: # value + op
             self.setFixedHeight(17)
 
         self.setStyleSheet("{ border: none }")
@@ -144,9 +144,9 @@ class BoardCellWidget(QWidget):
         # lineEdit Widget for writing cage operation and value
         font = Font(fontType = "Helvetica [Cronyx]",size = 13)
 
-        self.lineEdit = StandardLineEdit()
+        self.lineEdit = StandardLineEdit(cage = True)
         self.solutionLineEdit = StandardLineEdit(ReadOnly= False,fontSize= 16)
-        self.solutionLineEdit.setValidator(QIntValidator(0,initialDomainSize))
+        # self.solutionLineEdit.setValidator(QIntValidator(0,initialDomainSize))
 
         if color is not None:
             self.solutionLineEdit = StandardLineEdit(ReadOnly=False, fontSize=16,borderColor= color)

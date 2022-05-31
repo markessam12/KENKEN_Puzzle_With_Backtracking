@@ -5,7 +5,7 @@ from collections import deque
 
 
 class Kenken:
-    def __init__(self, n=3):
+    def __init__(self, n=3, controller=None):
         """
         grid: 2d list of current existing numbers, zeros for empty cells
         cage: dictionary of dictionaries representing cages in the kenken puzzle. ex: {1:{value:5,op:'+',cells:[(0,0),(0,1),(1,0)]}}
@@ -14,7 +14,7 @@ class Kenken:
 
         self.cages, self.ans = self.generate(n)
         self.n = n
-
+        self.controller = controller
         # --- 2D array, each cell position has cage number as its value ---
         self.cellToCageMap = self.mapCellsToCages()
         
@@ -365,6 +365,8 @@ class Kenken:
         # iterate over all possible values to test them
         for i in range(1, self.n + 1):
             # check if the current value will obey all constrains
+            if self.controller.demonstrate:
+                self.controller.setCell(row, col, i)
             if self.Bounding(row, col, i):
                 self.grid[row][col] = i
                 if self.backtracking():
@@ -372,6 +374,8 @@ class Kenken:
 
         # backtrack the value
         self.grid[row][col] = 0
+        if self.controller.demonstrate:
+            self.controller.setCell(row, col, ' ')
         return False
 
     def backtracking_FC(self):
@@ -387,6 +391,8 @@ class Kenken:
         for value in range(self.n):
             # check if the current value is in the domain of the cell
             if self.domains[row][col][value]:
+                if self.controller.demonstrate:
+                    self.controller.setCell(row, col, value)
                 # check if the current value will obey all constrains
                 if self.Bounding(row, col, value + 1):
                     self.grid[row][col] = value + 1
@@ -399,6 +405,8 @@ class Kenken:
 
         # backtrack the value
         self.grid[row][col] = 0
+        if self.controller.demonstrate:
+            self.controller.setCell(row, col, ' ')
         return False
 
     def backtracking_AC_FC(self):

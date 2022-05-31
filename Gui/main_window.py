@@ -1,4 +1,4 @@
-from pyQt5_style import *
+from Gui.pyQt5_style import *
 
 import sys
 
