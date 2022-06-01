@@ -1,7 +1,8 @@
 from Gui.pyQt5_style import *
 import time
 import random
-
+import sys
+sys.path.append('..')
 
 class KenkenGameWindow(QMainWindow):
     backWindow = pyqtSignal()
@@ -28,7 +29,7 @@ class KenkenGameWindow(QMainWindow):
         self.fileMenu = self.menuBar.addMenu('File')
 
         self.ClearGame = QAction('Clear Board', self)
-        self.ClearGame.setIcon(QIcon('Images/clear.png'))
+        self.ClearGame.setIcon(QIcon('Gui/Images/clear.png'))
         self.fileMenu.addAction(self.ClearGame)
         self.ClearGame.triggered.connect(self.ClarGameBoard)
 
@@ -62,9 +63,9 @@ class KenkenGameWindow(QMainWindow):
         temporaryLayout.addWidget(self.temporaryGameBoard, 0, Qt.AlignCenter)
 
         # ---temporaryButtons ---
-        backButton = PushButton(buttonText=" Back", picturePath="Images/backButton.ico")
-        checkButton = PushButton(buttonText=" Demo", picturePath="Images/checkButton.png")
-        solveButton = PushButton(buttonText=" Solve", picturePath="Images/solve.ico")
+        backButton = PushButton(buttonText=" Back", picturePath="Gui/Images/backButton.ico")
+        checkButton = PushButton(buttonText=" Demo", picturePath="Gui/Images/checkButton.png")
+        solveButton = PushButton(buttonText=" Solve", picturePath="Gui/Images/solve.ico")
 
         self.backButton = backButton
         self.checkButton = checkButton

@@ -1,6 +1,7 @@
 from Gui.pyQt5_style import *
 
 import sys
+sys.path.append('..')
 
 
 class MainWindow(QMainWindow):
@@ -50,19 +51,19 @@ class MainWindow(QMainWindow):
         self.fileMenu = self.menuBar.addMenu('File')
 
         self.kenkenGameRules = QAction('Game Rules', self)
-        self.kenkenGameRules.setIcon(QIcon('Images/gameRulesIcon.png'))
+        self.kenkenGameRules.setIcon(QIcon('Gui/Images/gameRulesIcon.png'))
         self.fileMenu.addAction(self.kenkenGameRules)
         self.kenkenGameRules.triggered.connect(self.gameRulesAction)
 
         self.exitItem = QAction('Exit', self)
-        self.exitItem.setIcon(QIcon('Images/exit.png'))
+        self.exitItem.setIcon(QIcon('Gui/Images/exit.png'))
         self.fileMenu.addAction(self.exitItem)
         self.exitItem.triggered.connect(self.exitItemAction)
 
     def addHelpMenu(self):
         self.helpMenu = self.menuBar.addMenu('Help')
         self.helpMenuItem = QAction('About', self)
-        self.helpMenuItem.setIcon(QIcon("Images/help.png"))
+        self.helpMenuItem.setIcon(QIcon("Gui/Images/help.png"))
         self.helpMenu.addAction(self.helpMenuItem)
         self.helpMenuItem.triggered.connect(self.helpItemAction)
 
@@ -96,7 +97,7 @@ class MainWindow(QMainWindow):
         self.helpLabel.setObjectName("plainTextEdit")
         self.horizontalLayout.addWidget(self.helpLabel)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.helpWindow.setWindowIcon(QIcon('Images/foeAsu.png'))
+        self.helpWindow.setWindowIcon(QIcon('Gui/Images/foeAsu.png'))
         self.helpWindow.setGeometry(450, 100, 550, 550)
         self.helpWindow.setWindowTitle("About")
 
@@ -136,7 +137,7 @@ class MainWindow(QMainWindow):
         self.gameRulesLabel.setObjectName("plainTextEdit")
         self.hLayout.addWidget(self.gameRulesLabel)
         self.vLayout.addLayout(self.hLayout)
-        self.gameRulesWindow.setWindowIcon(QIcon('Images/gameRulesIcon.png'))
+        self.gameRulesWindow.setWindowIcon(QIcon('Gui/Images/gameRulesIcon.png'))
         self.gameRulesWindow.setGeometry(450, 100, 550, 550)
         self.gameRulesWindow.setWindowTitle("Kenken puzzle Rules")
 
@@ -198,7 +199,7 @@ class MainWindow(QMainWindow):
         self.mainLayout.addWidget(self.algorithmLabel,0,Qt.AlignCenter)
 
     def addStartGameButton(self):
-        self.startGameButton = PushButton(buttonText= "Start Game", picturePath="Images/startGame.png")
+        self.startGameButton = PushButton(buttonText= "Start Game", picturePath="Gui/Images/startGame.png")
         self.startGameButton.setMinimumSize(400,60)
         self.startGameButton.setStyleSheet("border :2px solid black")
         self.mainLayout.addWidget(self.startGameButton,0,Qt.AlignCenter)
